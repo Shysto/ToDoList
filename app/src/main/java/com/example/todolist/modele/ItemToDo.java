@@ -2,7 +2,7 @@ package com.example.todolist.modele;
 
 import java.io.Serializable;
 
-/* Définition de la classe ItemToDo.
+/** Définition de la classe ItemToDo.
  * Cette classe représente un item (une tâche) d'une ToDoList
  */
 public class ItemToDo implements Serializable {
@@ -17,7 +17,7 @@ public class ItemToDo implements Serializable {
         this.fait = false;
     }
 
-    /* Constructeur par données
+    /** Constructeur par données
      * @param description la description à fournir à l'item
      */
     public ItemToDo(String description) {
@@ -25,7 +25,7 @@ public class ItemToDo implements Serializable {
         this.description = description;
     }
 
-    /* Constructeur par données
+    /** Constructeur par données
      * @param description la description à fournir à l'item
      * @param fait indique si l'item est accompli
      */
@@ -34,28 +34,28 @@ public class ItemToDo implements Serializable {
         this.fait = fait;
     }
 
-    /* Accesseur de la description
+    /** Accesseur de la description
      * @return la description associée à l'item
      */
     public String getDescription() {
         return description;
     }
 
-    /* Mutateur de la description
+    /** Mutateur de la description
      * @param uneDescription la description à associer à l'item
      */
     public void setDescription(String uneDescription) {
         this.description = uneDescription;
     }
 
-    /* Accesseur du booléen
+    /** Accesseur du booléen
      * @return true si l'item a été accompli, false sinon
      */
     public Boolean getFait() {
         return fait;
     }
 
-    /* Mutateur du booléen
+    /** Mutateur du booléen
      * @param fait indique si l'item a été accompli ou non
      */
     public void setFait(Boolean fait) {

@@ -11,15 +11,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".acceuil.MainActivity">
+        <activity android:name=".accueil.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".acceuil.SettingsActivity"/>
-        <activity android:name=".recycler_activities.ChoixListeActivity"/>
+        <activity android:name=".accueil.SettingsActivity"/>
+        <activity android:name=".recycler_activities.ChoixListActivity"/>
         <activity android:name=".recycler_activities.ShowListActivity"/>
     </application>
 
