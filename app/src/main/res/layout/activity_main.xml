@@ -7,7 +7,7 @@
     tools:context=".MainActivity">
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/editTextPseudo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -16,17 +16,17 @@
         android:ems="10"
         android:hint="@string/pseudo"
         android:inputType="textPersonName"
-        app:layout_constraintEnd_toStartOf="@+id/button"
+        app:layout_constraintEnd_toStartOf="@+id/btnOk"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="Autofill" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnOk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:text="@android:string/ok"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/editText" />
+        app:layout_constraintTop_toTopOf="@+id/editTextPseudo" />
 </androidx.constraintlayout.widget.ConstraintLayout>
