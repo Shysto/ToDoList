@@ -1,10 +1,12 @@
-package com.example.todolist;
+package com.example.todolist.acceuil;
 
 import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.todolist.R;
 
 public class SettingsActivity extends AppCompatActivity {
 

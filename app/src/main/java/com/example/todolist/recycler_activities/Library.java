@@ -1,17 +1,16 @@
-package com.example.todolist;
+package com.example.todolist.recycler_activities;
 
 import android.content.Context;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.todolist.modele.ProfilListeToDo;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-
-import modele.ProfilListeToDo;
 
 public class Library extends AppCompatActivity {
 

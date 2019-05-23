@@ -1,6 +1,4 @@
-package com.example.todolist;
-
-import androidx.appcompat.app.AppCompatActivity;
+package com.example.todolist.acceuil;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +10,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.todolist.R;
+import com.example.todolist.recycler_activities.ChoixListeActivity;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     EditText editTextPseudo;
@@ -21,7 +24,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button btnOk = findViewById(R.id.btnOk);
+        Button btnOk = findViewById(R.id.btnOk2);
         editTextPseudo = findViewById(R.id.editTextPseudo);
 
         btnOk.setOnClickListener(this);
@@ -44,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.btnOk:
+            case R.id.btnOk2:
                 sauverPseudo();
                 ouvrirChoixListeActivity();
                 break;
@@ -53,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void ouvrirChoixListeActivity() {
-        Intent choixListeActivity = new Intent(MainActivity.this,ChoixListeActivity.class);
+        Intent choixListeActivity = new Intent(MainActivity.this, ChoixListeActivity.class);
         choixListeActivity.putExtra("pseudo",editTextPseudo.getText().toString());
         startActivity(choixListeActivity);
     }

@@ -1,11 +1,13 @@
-package com.example.todolist;
+package com.example.todolist.acceuil;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.preference.Preference;
 import android.preference.PreferenceManager;
 
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+
+import com.example.todolist.R;
 
 
 public class SettingsFragment extends PreferenceFragmentCompat {
