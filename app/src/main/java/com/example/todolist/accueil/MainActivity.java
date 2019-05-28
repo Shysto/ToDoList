@@ -38,6 +38,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnOk.setOnClickListener(this);
     }
 
+    /** Fonction onResume appelée lors de la reprise de l'activité principale après mise en pause pour cause d'appel à une autre activité
+     * Permet de remplir par défaut le champ pseudo avec le denrier pseudo rentré
+     * Le pseudo sera ainsi rafraichit à chaque fois
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        /* Affichage du dernier pseudo saisi */
+        SharedPreferences preferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        editTextPseudo.setText(preferences.getString("pseudo",""));
+
+    }
+
     /** Création de la ToolBar au démarrage de l'activité
      * @param menu le menu de la ToolBar qui contient les différents items
      * @return true pour que le menu soit affiché

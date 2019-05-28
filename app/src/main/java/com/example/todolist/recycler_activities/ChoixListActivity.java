@@ -63,6 +63,24 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
         ajouterListe = findViewById(R.id.ajouterListe);
     }
 
+    /** Fonction onPause appelée lors d'un changement d'activité au détriment de celle-ci
+     * Permet de sauvegarder le profil courant dans les préférences
+     */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sauveProfilToJsonFile(profil);
+    }
+
+    /** Fonction onResume appelée après la création de l'activité et à chaque retour sur l'activité courante
+     * Permet de recharger le profil courant à partir du pseudo
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        profil = importProfil(pseudo);
+    }
+
     /** Fonction par défaut de l'interface View.OnClickListener, appelée lors du clic sur la vue
      * @param v la vue cliquée
      * Ici, lors du clic sur le bouton OK, on crée la ToDoList avec le titre fourni par l'utilisateur,
