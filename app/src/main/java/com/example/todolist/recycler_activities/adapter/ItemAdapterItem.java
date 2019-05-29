@@ -74,6 +74,7 @@ public class ItemAdapterItem extends RecyclerView.Adapter<ItemAdapterItem.ItemVi
         public ItemViewHolder(@NonNull View itemView) {
             super(itemView);
             description = itemView.findViewById(R.id.checkBox);
+            description.setOnClickListener(this);
         }
 
         /** Permet de lier les données de l'item à sa vue

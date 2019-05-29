@@ -122,6 +122,8 @@ public class ShowListActivity extends Library implements View.OnClickListener,
     @Override
     public void clickItem(int position) {
         listeItem.get(position).setFait(!listeItem.get(position).getFait());
+
+        Log.i("ClickItem", "clickItem: "+profil.toString());
         itemAdapterItem.notifyItemChanged(position);
     }
 }
