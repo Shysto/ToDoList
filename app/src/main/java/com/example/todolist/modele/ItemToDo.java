@@ -64,6 +64,6 @@ public class ItemToDo implements Serializable {
 
     @Override
     public String toString() {
-        return description;
+        return description+" : "+fait;
     }
 }

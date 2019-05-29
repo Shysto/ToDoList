@@ -48,15 +48,6 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         pseudo = preferences.getString("pseudo","");
 
-        /* Création du profil associé */
-        profil = importProfil(pseudo);
-
-        /* Mise en place de la Recycler View sur la liste des ToDoLists associée au profil*/
-        recyclerView = findViewById(R.id.recyclerView);
-        itemAdapterList = new ItemAdapterList(profil.getMesListesToDo(),this);
-        recyclerView.setAdapter(itemAdapterList);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
         /* Traitement de l'ajout d'une ToDoList au profil */
         Button btnOk = findViewById(R.id.btnOk);
         btnOk.setOnClickListener(this);
@@ -73,12 +64,21 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
     }
 
     /** Fonction onResume appelée après la création de l'activité et à chaque retour sur l'activité courante
-     * Permet de recharger le profil courant à partir du pseudo
+     * Permet de recharger le profil courant à partir du pseudo et de générer la RecyclerView associée
+     *      * à la liste des ToDoLists
      */
     @Override
     protected void onResume() {
         super.onResume();
+        /* Création du profil associé */
         profil = importProfil(pseudo);
+
+        /* Mise en place de la Recycler View sur la liste des ToDoLists associée au profil*/
+        recyclerView = findViewById(R.id.recyclerView);
+        itemAdapterList = new ItemAdapterList(profil.getMesListesToDo(),this);
+        recyclerView.setAdapter(itemAdapterList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
     }
 
     /** Fonction par défaut de l'interface View.OnClickListener, appelée lors du clic sur la vue
