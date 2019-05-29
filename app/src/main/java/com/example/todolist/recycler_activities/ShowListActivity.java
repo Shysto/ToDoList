@@ -26,7 +26,8 @@ import java.util.ArrayList;
 /** Définition de la classe ShowListActivity.
  * Cette classe représente l'activité ShowList Activity de l'application
  */
-public class ShowListActivity extends Library implements View.OnClickListener{
+public class ShowListActivity extends Library implements View.OnClickListener,
+        ItemAdapterItem.onClickItemListener{
 
     /* Le pseudo rentré par l'utilisateur dans l'activité principale */
     private String pseudo;
@@ -88,7 +89,7 @@ public class ShowListActivity extends Library implements View.OnClickListener{
         /* Mise en place de la Recycler View sur la liste des items associée à la ToDoList */
         recyclerView = findViewById(R.id.recyclerView);
         listeItem = profil.getMesListesToDo().get(position).getLesItems();
-        itemAdapterItem = new ItemAdapterItem(listeItem);
+        itemAdapterItem = new ItemAdapterItem(listeItem, this);
         recyclerView.setAdapter(itemAdapterItem);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
@@ -113,5 +114,14 @@ public class ShowListActivity extends Library implements View.OnClickListener{
                 break;
             default:
         }
+    }
+
+    /** Permet de changer la valeur du paramètre fait de l'item sélectionné
+     * @param position l'indice où se trouve l'item dans la liste des items
+     */
+    @Override
+    public void clickItem(int position) {
+        listeItem.get(position).setFait(!listeItem.get(position).getFait());
+        itemAdapterItem.notifyItemChanged(position);
     }
 }

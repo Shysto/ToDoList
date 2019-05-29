@@ -20,12 +20,15 @@ public class ItemAdapterItem extends RecyclerView.Adapter<ItemAdapterItem.ItemVi
 
     /* La liste des items à afficher */
     private List<ItemToDo> lesItems;
+    /* Écouteur d'évènement */
+    private onClickItemListener onClickItemListener;
 
     /** Constructeur par paramètres
      * @param lesItems la liste des items
      */
-    public ItemAdapterItem(List<ItemToDo> lesItems) {
+    public ItemAdapterItem(List<ItemToDo> lesItems, onClickItemListener onClickItemListener) {
         this.lesItems = lesItems;
+        this.onClickItemListener = onClickItemListener;
     }
 
     /** Permet de créer la vue associée à l'item
@@ -89,10 +92,16 @@ public class ItemAdapterItem extends RecyclerView.Adapter<ItemAdapterItem.ItemVi
          */
         @Override
         public void onClick(View v) {
-            description.setChecked(!description.isChecked());
-            lesItems.get(getAdapterPosition()).setFait(description.isChecked());
-            notifyItemChanged(getAdapterPosition());
+            onClickItemListener.clickItem(getAdapterPosition());
         }
 
+    }
+
+    /**
+     * Interface permettant de gérer le clic sur un élément de la liste des item
+     * (Pas d'accès direct au context this depuis cette classe, il faut le passer en paramètre)
+     */
+    public interface onClickItemListener{
+        void clickItem(int position);
     }
 }
