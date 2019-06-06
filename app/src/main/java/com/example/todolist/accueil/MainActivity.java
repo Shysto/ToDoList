@@ -2,18 +2,29 @@ package com.example.todolist.accueil;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.todolist.R;
+import com.example.todolist.api.Hash;
+import com.example.todolist.api.TodoApiService;
+import com.example.todolist.api.TodoApiServiceFactory;
 import com.example.todolist.recycler_activities.ChoixListActivity;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /** Définition de la classe MainActivity.
  * Cette classe représente l'activité principale de l'application
@@ -22,6 +33,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /* Le champ texte dans lequel l'utilisateur va saisir son pseudo */
     EditText editTextPseudo;
+    String url;
+    Button btnOk;
+    private Call<Hash> call;
+    SharedPreferences preferences;
 
     /** Fonction onCreate appelée lors de le création de l'activité
      * @param savedInstanceState données à récupérer si l'activité est réinitialisée après avoir planté
@@ -32,11 +47,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button btnOk = findViewById(R.id.btnOk);
+        btnOk = findViewById(R.id.btnOk);
         editTextPseudo = findViewById(R.id.editTextPseudo);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         btnOk.setOnClickListener(this);
+
+        verfierUrl();
+
     }
+
+
 
     /** Fonction onResume appelée lors de la reprise de l'activité principale après mise en pause pour cause d'appel à une autre activité
      * Permet de remplir par défaut le champ pseudo avec le denrier pseudo rentré
@@ -46,9 +67,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         /* Affichage du dernier pseudo saisi */
-        SharedPreferences preferences =
-                PreferenceManager.getDefaultSharedPreferences(this);
         editTextPseudo.setText(preferences.getString("pseudo",""));
+
+
+        btnOk.setEnabled(verifReseau());
 
     }
 
@@ -84,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()){
             case R.id.btnOk:
                 sauverPseudo();
-                ouvrirChoixListeActivity();
+                sync();
                 break;
             default:
         }
@@ -108,5 +130,92 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editor.putString("pseudo",editTextPseudo.getText().toString());
         editor.apply();
         editor.commit();
+    }
+
+    private void verfierUrl() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if(preferences.getString("url", "").equals("")){
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("url","http://tomnab.fr/todo-api");
+            editor.apply();
+            editor.commit();
+        }
+        url = preferences.getString("url", "");
+    }
+
+    public boolean verifReseau()
+    {
+        // On vérifie si le réseau est disponible,
+        // si oui on change le statut du bouton de connexion
+        ConnectivityManager cnMngr = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cnMngr.getActiveNetworkInfo();
+
+        String sType = "Aucun réseau détecté";
+        Boolean bStatut = false;
+        if (netInfo != null)
+        {
+
+            NetworkInfo.State netState = netInfo.getState();
+
+            if (netState.compareTo(NetworkInfo.State.CONNECTED) == 0)
+            {
+                bStatut = true;
+                int netType= netInfo.getType();
+                switch (netType)
+                {
+                    case ConnectivityManager.TYPE_MOBILE :
+                        sType = "Réseau mobile détecté"; break;
+                    case ConnectivityManager.TYPE_WIFI :
+                        sType = "Réseau wifi détecté"; break;
+                }
+
+            }
+        }
+
+        Log.i("REZO", "verifReseau: " + sType );
+        return bStatut;
+    }
+
+    private void sync() {
+
+        TodoApiService todoApiService = TodoApiServiceFactory.createService(TodoApiService.class);
+
+        call = todoApiService.connexion();
+        call.enqueue(new Callback<Hash>() {
+            @Override
+            public void onResponse(Call<Hash> call, Response<Hash> response) {
+
+                if(response.isSuccessful()){
+                    // stocker hash et passer en bundle
+                    //intent
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString("hash",response.body().hash);
+                    editor.apply();
+                    editor.commit();
+
+
+                    Log.i("Main", "onResponse: " + response.body().hash );
+
+                    ouvrirChoixListeActivity();
+
+
+                }else {
+                    Log.d("TAG", "onResponse: "+response.code());
+                    Toast.makeText(MainActivity.this,"Error code : "+response.code(),Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override public void onFailure(Call<Hash> call, Throwable t) {
+                Toast.makeText(MainActivity.this,"Error code : " ,Toast.LENGTH_LONG).show();
+                Log.d("TAG", "onFailure() called with: call = [" + call + "], t = [" + t + "]");
+            }
+        });
+
+    }
+
+    @Override protected void onStop() {
+        super.onStop();
+        call.cancel();
     }
 }
