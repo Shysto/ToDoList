@@ -33,10 +33,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /* Le champ texte dans lequel l'utilisateur va saisir son pseudo */
     EditText editTextPseudo;
+    EditText password;
     String url;
     Button btnOk;
     private Call<Hash> call;
     SharedPreferences preferences;
+    TodoApiService todoApiService;
 
     /** Fonction onCreate appelée lors de le création de l'activité
      * @param savedInstanceState données à récupérer si l'activité est réinitialisée après avoir planté
@@ -49,11 +51,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         btnOk = findViewById(R.id.btnOk);
         editTextPseudo = findViewById(R.id.editTextPseudo);
+        password = findViewById(R.id.password);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         btnOk.setOnClickListener(this);
-
-        verfierUrl();
 
     }
 
@@ -68,8 +69,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
         /* Affichage du dernier pseudo saisi */
         editTextPseudo.setText(preferences.getString("pseudo",""));
-
-
+        verfierUrl();
         btnOk.setEnabled(verifReseau());
 
     }
@@ -137,11 +137,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if(preferences.getString("url", "").equals("")){
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putString("url","http://tomnab.fr/todo-api");
+            editor.putString("url","http://tomnab.fr/todo-api/");
             editor.apply();
             editor.commit();
         }
         url = preferences.getString("url", "");
+        TodoApiServiceFactory.changeApiBaseUrl(url);
     }
 
     public boolean verifReseau()
@@ -179,9 +180,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void sync() {
 
-        TodoApiService todoApiService = TodoApiServiceFactory.createService(TodoApiService.class);
+        todoApiService = TodoApiServiceFactory.createService(TodoApiService.class);
 
-        call = todoApiService.connexion();
+        call = todoApiService.connexion(editTextPseudo.getText().toString(), password.getText().toString());
         call.enqueue(new Callback<Hash>() {
             @Override
             public void onResponse(Call<Hash> call, Response<Hash> response) {
