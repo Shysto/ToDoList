@@ -2,8 +2,8 @@ package com.example.todolist.api.response_class;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ItemResponse {
+public class ListResponse {
 
-    @SerializedName("item")
-    public UnItem item;
+    @SerializedName("list")
+    public UneListe list;
 }

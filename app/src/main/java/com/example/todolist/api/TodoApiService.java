@@ -3,6 +3,7 @@ package com.example.todolist.api;
 import com.example.todolist.api.response_class.Hash;
 import com.example.todolist.api.response_class.ItemResponse;
 import com.example.todolist.api.response_class.Items;
+import com.example.todolist.api.response_class.ListResponse;
 import com.example.todolist.api.response_class.Lists;
 import com.example.todolist.api.response_class.UnItem;
 
@@ -32,4 +33,7 @@ public interface TodoApiService {
   @POST("lists/{idListe}/items")
   Call<ItemResponse> ajoutItem(@Header("hash") String hash, @Path("idListe") int idListe,
                                @Query("label") String label);
+
+  @POST("lists")
+  Call<ListResponse> ajoutListe(@Header("hash") String hash, @Query("label") String label);
 }

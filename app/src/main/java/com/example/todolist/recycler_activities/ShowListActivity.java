@@ -44,8 +44,6 @@ public class ShowListActivity extends Library implements View.OnClickListener,
     private String pseudo;
     /* La description du nouvel item à ajouter, saisi par l'utilisateur dans l'activité courante */
     private EditText ajouterItem;
-    /* Le profil associé au pseudo */
-    private ProfilListeToDo profil;
     /* L'adapteur associé à la Recycler View de l'activité courante */
     private ItemAdapterItem itemAdapterItem;
     /* La Recycle View de l'activité courante */

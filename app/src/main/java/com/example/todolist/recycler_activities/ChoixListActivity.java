@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.todolist.R;
 import com.example.todolist.api.TodoApiService;
 import com.example.todolist.api.TodoApiServiceFactory;
+import com.example.todolist.api.response_class.ListResponse;
 import com.example.todolist.api.response_class.Lists;
 import com.example.todolist.api.response_class.UneListe;
 import com.example.todolist.modele.ListeToDo;
@@ -80,8 +81,6 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
     @Override
     protected void onPause() {
         super.onPause();
-
-        //Envoyer la liste de listes a l'API
     }
 
     /** Fonction onResume appelée après la création de l'activité et à chaque retour sur l'activité courante
@@ -95,14 +94,7 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
         /* Import du profil associé */
         //profil = importProfil(pseudo);
 
-        Log.i("TAG", "onResume: sync");
-
         sync();
-
-        Log.i("TAG", "onResume: post sync");
-
-        /* Mise en place de la Recycler View sur la liste des ToDoLists associée au profil*/
-
 
     }
 
@@ -115,11 +107,8 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btnOk:
-                ListeToDo listeToDo = new ListeToDo();
-                listeToDo.setTitreListeToDo(ajouterListe.getText().toString());
-                Log.i("ChoixListe", "onClick: " + listeToDo.toString());
-                profil.ajouteListe(listeToDo);
-                itemAdapterList.notifyItemInserted(profil.getMesListesToDo().size()-1);
+                String label = ajouterListe.getText().toString();
+                ajoutListe(label);
                 Log.i("ChoixListe", "onClick: " + itemAdapterList.getItemCount());
                 break;
             default:
@@ -159,6 +148,7 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
                         data.add(new ListeToDo(x.titreListeToDO,x.id));
                         Log.i("TAG", "onResponse: " + x.id + " " + x.titreListeToDO);
                     }
+                    /* Mise en place de la Recycler View sur la liste des ToDoLists associée au profil*/
                     recyclerView = findViewById(R.id.recyclerView);
                     itemAdapterList = new ItemAdapterList(data,ChoixListActivity.this);
                     recyclerView.setAdapter(itemAdapterList);
@@ -174,5 +164,28 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
             }
         });
 
+    }
+
+    private void ajoutListe(String label) {
+        todoApiService = TodoApiServiceFactory.createService(TodoApiService.class);
+        Call<ListResponse> call = todoApiService.ajoutListe(hash,label);
+        call.enqueue(new Callback<ListResponse>() {
+            @Override
+            public void onResponse(Call<ListResponse> call, Response<ListResponse> response) {
+                if(response.isSuccessful()){
+                    UneListe x = response.body().list;
+                    ListeToDo item = new ListeToDo(x.titreListeToDO, x.id);
+                    data.add(item);
+                    itemAdapterList.notifyItemInserted(data.size()-1);
+                    Log.i("TAG", "onResponse: nice");
+                } else {
+                    Log.d("TAG", "onResponse: "+response.code());
+                }
+            }
+            @Override public void onFailure(Call<ListResponse> call, Throwable t) {
+                Toast.makeText(ChoixListActivity.this,"Error code : " ,Toast.LENGTH_LONG).show();
+                Log.d("TAG", "onFailure() called with: call = [" + call + "], t = [" + t + "]");
+            }
+        });
     }
 }

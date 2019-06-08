@@ -20,7 +20,7 @@ public class ListeToDo implements Serializable {
         this.lesItems = new ArrayList<>();
     }
 
-    public ListeToDo(String titreListeToDo,int id) {
+    public ListeToDo(String titreListeToDo, int id) {
         this.titreListeToDo = titreListeToDo;
         this.lesItems = new ArrayList<>();
         this.id = id;
