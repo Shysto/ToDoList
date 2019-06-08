@@ -4,9 +4,9 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class Lists {
+public class Items {
 
-    @SerializedName("lists")
-    public List<UneListe> listeDeListes;
+    @SerializedName("items")
+    public List<UnItem> listeItems;
 
 }

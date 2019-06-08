@@ -11,6 +11,8 @@ public class ItemToDo implements Serializable {
     /* Indique si l'item a été accompli ou non */
     private Boolean fait;
 
+    private int id;
+
     /* Constructeur par défaut */
     public ItemToDo() {
         this.description = "";
@@ -34,6 +36,16 @@ public class ItemToDo implements Serializable {
         this.fait = fait;
     }
 
+    public ItemToDo(String description, Boolean fait, int id) {
+        this.description = description;
+        this.fait = fait;
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
     /** Accesseur de la description
      * @return la description associée à l'item
      */
@@ -51,8 +63,15 @@ public class ItemToDo implements Serializable {
     /** Accesseur du booléen
      * @return true si l'item a été accompli, false sinon
      */
-    public Boolean getFait() {
+    public Boolean isFait() {
         return fait;
+    }
+
+    public int getFait(){
+        if(fait)
+            return 1;
+        else
+            return 0;
     }
 
     /** Mutateur du booléen

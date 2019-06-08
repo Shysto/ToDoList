@@ -11,17 +11,28 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.todolist.R;
+import com.example.todolist.api.TodoApiService;
+import com.example.todolist.api.TodoApiServiceFactory;
+import com.example.todolist.api.response_class.ItemResponse;
+import com.example.todolist.api.response_class.Items;
+import com.example.todolist.api.response_class.UnItem;
 import com.example.todolist.modele.ItemToDo;
 import com.example.todolist.modele.ProfilListeToDo;
 import com.example.todolist.recycler_activities.adapter.ItemAdapterItem;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /** Définition de la classe ShowListActivity.
  * Cette classe représente l'activité ShowList Activity de l'application
@@ -42,8 +53,9 @@ public class ShowListActivity extends Library implements View.OnClickListener,
     /* La liste des items associé à la ToDoList courante */
     private ArrayList<ItemToDo> listeItem;
     /* La position (identifiant) de la ToDoList courante */
-    private int position;
+    private int idListe;
     private String hash;
+    private TodoApiService todoApiService;
 
     /**
      * Fonction onCreate appelée lors de le création de l'activité
@@ -61,7 +73,7 @@ public class ShowListActivity extends Library implements View.OnClickListener,
         pseudo = preferences.getString("pseudo", "");
         hash = preferences.getString("hash","");
         Bundle b = this.getIntent().getExtras();
-        position = b.getInt("idListe");
+        idListe = b.getInt("idListe");
 
         /* Traitement de l'ajout d'un item à la ToDoList */
         Button btnOk = findViewById(R.id.btnOk);
@@ -75,8 +87,9 @@ public class ShowListActivity extends Library implements View.OnClickListener,
     @Override
     protected void onPause() {
         super.onPause();
-        sauveProfilToJsonFile(profil);
     }
+
+
 
     /** Fonction onResume appelée après la création de l'activité et à chaque retour sur l'activité courante
      * Permet de recharger le profil courant à partir du pseudo et de générer la RecyclerView associée
@@ -85,17 +98,10 @@ public class ShowListActivity extends Library implements View.OnClickListener,
     @Override
     protected void onResume() {
         super.onResume();
-        /* Création du profil associé */
-        profil = importProfil(pseudo);
-
-        /* Mise en place de la Recycler View sur la liste des items associée à la ToDoList */
-        recyclerView = findViewById(R.id.recyclerView);
-        listeItem = profil.getMesListesToDo().get(position).getLesItems();
-        itemAdapterItem = new ItemAdapterItem(listeItem, this);
-        recyclerView.setAdapter(itemAdapterItem);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recupItems();
     }
 
+   
     /** Fonction par défaut de l'interface View.OnClickListener, appelée lors du clic sur la vue
      * @param v la vue cliquée
      * Ici, lors du clic sur le bouton OK, on crée l'item avec la description fournie par l'utilisateur,
@@ -105,13 +111,8 @@ public class ShowListActivity extends Library implements View.OnClickListener,
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btnOk:
-                ItemToDo item = new ItemToDo();
-                item.setDescription(ajouterItem.getText().toString());
-                Log.i("ChoixListe", "onClick: " + item.toString());
-                listeItem = profil.getMesListesToDo().get(position).getLesItems();
-                listeItem.add(item);
-                profil.getMesListesToDo().get(position).setLesItems(listeItem);
-                itemAdapterItem.notifyItemInserted(listeItem.size()-1);
+                String label = ajouterItem.getText().toString();
+                ajoutItem(label);
                 Log.i("ChoixListe", "onClick: " + itemAdapterItem.getItemCount());
                 break;
             default:
@@ -123,9 +124,85 @@ public class ShowListActivity extends Library implements View.OnClickListener,
      */
     @Override
     public void clickItem(int position) {
-        listeItem.get(position).setFait(!listeItem.get(position).getFait());
-
-        Log.i("ClickItem", "clickItem: "+profil.toString());
+        listeItem.get(position).setFait(!listeItem.get(position).isFait());
         itemAdapterItem.notifyItemChanged(position);
+        Log.i("TAG", "clickItem: " + listeItem.get(position).getFait());
+        Log.i("TAG", "clickItem: "+ listeItem.get(position).getId());
+        cocherItem(listeItem.get(position).getId(), listeItem.get(position).getFait());
     }
+
+    private void recupItems() {
+        todoApiService = TodoApiServiceFactory.createService(TodoApiService.class);
+        Call<Items> call = todoApiService.recupereItems(hash, idListe);
+
+        call.enqueue(new Callback<Items>() {
+            @Override
+            public void onResponse(Call<Items> call, Response<Items> response) {
+                if(response.isSuccessful()){
+                    //stocke les listes
+                    List<UnItem> liste = response.body().listeItems;
+                    listeItem = new ArrayList<ItemToDo>();
+                    for (UnItem x : liste) {
+                        listeItem.add(new ItemToDo(x.label,x.checked==1,x.id));
+                        Log.i("TAG", "onResponse: " + x.id + " ");
+                    }
+                    recyclerView = findViewById(R.id.recyclerView);
+                    itemAdapterItem = new ItemAdapterItem(listeItem, ShowListActivity.this);
+                    recyclerView.setAdapter(itemAdapterItem);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(ShowListActivity.this));
+
+                }else {
+                    Log.d("TAG", "onResponse: "+response.code());
+                }
+            }
+            @Override public void onFailure(Call<Items> call, Throwable t) {
+                Toast.makeText(ShowListActivity.this,"Error code : " ,Toast.LENGTH_LONG).show();
+                Log.d("TAG", "onFailure() called with: call = [" + call + "], t = [" + t + "]");
+            }
+        });
+
+    }
+
+    private void cocherItem(int idItem, int etat) {
+        todoApiService = TodoApiServiceFactory.createService(TodoApiService.class);
+        Call<UnItem> call = todoApiService.cocherItem(hash, idListe, idItem, etat);
+        call.enqueue(new Callback<UnItem>() {
+            @Override
+            public void onResponse(Call<UnItem> call, Response<UnItem> response) {
+                if(response.isSuccessful()){
+                    Log.i("TAG", "onResponse: nice");
+                }else {
+                    Log.d("TAG", "onResponse: "+response.code());
+                }
+            }
+            @Override public void onFailure(Call<UnItem> call, Throwable t) {
+                Toast.makeText(ShowListActivity.this,"Error code : " ,Toast.LENGTH_LONG).show();
+                Log.d("TAG", "onFailure() called with: call = [" + call + "], t = [" + t + "]");
+            }
+        });
+    }
+
+    private void ajoutItem(final String label) {
+        todoApiService = TodoApiServiceFactory.createService(TodoApiService.class);
+        Call<ItemResponse> call = todoApiService.ajoutItem(hash, idListe,label);
+        call.enqueue(new Callback<ItemResponse>() {
+            @Override
+            public void onResponse(Call<ItemResponse> call, Response<ItemResponse> response) {
+                if(response.isSuccessful()){
+                    UnItem x = response.body().item;
+                    ItemToDo item = new ItemToDo(x.label,false,x.id);
+                    listeItem.add(item);
+                    itemAdapterItem.notifyItemInserted(listeItem.size()-1);
+                    Log.i("TAG", "onResponse: nice");
+                }else {
+                    Log.d("TAG", "onResponse: "+response.code());
+                }
+            }
+            @Override public void onFailure(Call<ItemResponse> call, Throwable t) {
+                Toast.makeText(ShowListActivity.this,"Error code : " ,Toast.LENGTH_LONG).show();
+                Log.d("TAG", "onFailure() called with: call = [" + call + "], t = [" + t + "]");
+            }
+        });
+    }
+
 }

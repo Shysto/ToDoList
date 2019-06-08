@@ -18,7 +18,7 @@ import com.example.todolist.R;
 import com.example.todolist.api.TodoApiService;
 import com.example.todolist.api.TodoApiServiceFactory;
 import com.example.todolist.api.response_class.Lists;
-import com.example.todolist.api.response_class.uneListe;
+import com.example.todolist.api.response_class.UneListe;
 import com.example.todolist.modele.ListeToDo;
 import com.example.todolist.modele.ProfilListeToDo;
 import com.example.todolist.recycler_activities.adapter.ItemAdapterList;
@@ -153,9 +153,9 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
                 Log.i("TAG", "onResponse: 3");
                 if(response.isSuccessful()){
                     //stocke les listes
-                    List<uneListe> lists = response.body().listeDeListes;
+                    List<UneListe> lists = response.body().listeDeListes;
                     data = new ArrayList<ListeToDo>();
-                    for (uneListe x : lists) {
+                    for (UneListe x : lists) {
                         data.add(new ListeToDo(x.titreListeToDO,x.id));
                         Log.i("TAG", "onResponse: " + x.id + " " + x.titreListeToDO);
                     }
