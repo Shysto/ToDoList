@@ -17,7 +17,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.todolist.R;
-import com.example.todolist.api.Hash;
+import com.example.todolist.api.response_class.Hash;
 import com.example.todolist.api.TodoApiService;
 import com.example.todolist.api.TodoApiServiceFactory;
 import com.example.todolist.recycler_activities.ChoixListActivity;

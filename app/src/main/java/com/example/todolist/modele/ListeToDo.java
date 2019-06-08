@@ -12,10 +12,23 @@ public class ListeToDo implements Serializable {
     /* Liste des items de la ToDoList */
     private ArrayList<ItemToDo> lesItems;
 
+    private int id;
+
     /* Constructeur par défaut */
     public ListeToDo() {
         this.titreListeToDo = "";
         this.lesItems = new ArrayList<>();
+    }
+
+    public ListeToDo(String titreListeToDo,int id) {
+        this.titreListeToDo = titreListeToDo;
+        this.lesItems = new ArrayList<>();
+        this.id = id;
+
+    }
+
+    public int getId() {
+        return id;
     }
 
     /** Accesseur du titre

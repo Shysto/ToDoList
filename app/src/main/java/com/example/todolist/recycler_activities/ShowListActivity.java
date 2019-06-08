@@ -43,6 +43,7 @@ public class ShowListActivity extends Library implements View.OnClickListener,
     private ArrayList<ItemToDo> listeItem;
     /* La position (identifiant) de la ToDoList courante */
     private int position;
+    private String hash;
 
     /**
      * Fonction onCreate appelée lors de le création de l'activité
@@ -58,6 +59,7 @@ public class ShowListActivity extends Library implements View.OnClickListener,
         /* Récupération du pseudo depuis les préférences de l'application */
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         pseudo = preferences.getString("pseudo", "");
+        hash = preferences.getString("hash","");
         Bundle b = this.getIntent().getExtras();
         position = b.getInt("idListe");
 
