@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     ouvrirChoixListeActivity();
 
 
-                }else {
+                } else {
                     Log.d("TAG", "onResponse: "+response.code());
                     Toast.makeText(MainActivity.this,"Error code : "+response.code(),Toast.LENGTH_LONG).show();
                 }

@@ -35,6 +35,8 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
     /* La Recycle View de l'activité courante */
     private RecyclerView recyclerView;
 
+    private String hash;
+
     /** Fonction onCreate appelée lors de le création de l'activité
      * @param savedInstanceState données à récupérer si l'activité est réinitialisée après avoir planté
      * Lie l'activité à son layout et récupère les éléments avec lesquels on peut intéragir
@@ -47,6 +49,7 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
         /* Récupération du pseudo depuis les préférences de l'application */
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         pseudo = preferences.getString("pseudo","");
+        hash = preferences.getString("hash", "");
 
         /* Traitement de l'ajout d'une ToDoList au profil */
         Button btnOk = findViewById(R.id.btnOk);
