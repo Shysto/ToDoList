@@ -83,7 +83,7 @@ public class ItemAdapterItem extends RecyclerView.Adapter<ItemAdapterItem.ItemVi
          */
         public void bind(ItemToDo item) {
             description.setText(item.getDescription());
-            description.setChecked(item.getFait());
+            description.setChecked(item.isFait());
         }
 
         /** Fonction par défaut de l'interface View.OnClickListener, appelée lors du clic sur la vue
