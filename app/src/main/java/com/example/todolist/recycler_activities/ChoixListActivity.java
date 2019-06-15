@@ -47,10 +47,15 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
     private ItemAdapterList itemAdapterList;
     /* La Recycle View de l'activité courante */
     private RecyclerView recyclerView;
+    /* Le hash d'identification auprès de l'API */
     private String hash;
+    /* L'interface de connexion auprès de l'API */
     TodoApiService todoApiService;
+    /* La file des requêtes auprès de l'API */
     private Call<Lists> call;
+    /* Les préférences de l'application */
     private SharedPreferences preferences;
+    /* La liste de ToDoLists associée à l'utilisateur courant */
     private List<ListeToDo> data;
 
 
@@ -75,33 +80,18 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
         ajouterListe = findViewById(R.id.ajouterListe);
     }
 
-    /** Fonction onPause appelée lors d'un changement d'activité au détriment de celle-ci
-     * Permet de sauvegarder le profil courant dans les préférences
-     */
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
     /** Fonction onResume appelée après la création de l'activité et à chaque retour sur l'activité courante
-     * Permet de recharger le profil courant à partir du pseudo et de générer la RecyclerView associée
-     *      * à la liste des ToDoLists
+     * Permet de générer la RecyclerView associée à la liste des ToDoLists
      */
     @Override
     protected void onResume() {
         super.onResume();
-
-        /* Import du profil associé */
-        //profil = importProfil(pseudo);
-
         sync();
-
     }
 
     /** Fonction par défaut de l'interface View.OnClickListener, appelée lors du clic sur la vue
      * @param v la vue cliquée
-     * Ici, lors du clic sur le bouton OK, on crée la ToDoList avec le titre fourni par l'utilisateur,
-     *          et on l'ajoute à la liste des ToDoLists du profil
+     * Ici, lors du clic sur le bouton OK, on ajoute la ToDoList dans l'API et dans la RecyclerView
      */
     @Override
     public void onClick(View v) {
@@ -126,26 +116,25 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
     }
 
 
+    /** Permet de récupérer la liste des ToDoLists associée à l'utilisateur courant
+     * La réponse de la requête vers l'API met à jour la liste data en cas de succès
+     */
     private void sync() {
 
         todoApiService = TodoApiServiceFactory.createService(TodoApiService.class);
 
-        Log.i("TAG", "oncall: 1");
         call = todoApiService.recupereListes(hash);
-
-        Log.i("TAG", "oncall: 2");
-
 
         call.enqueue(new Callback<Lists>() {
             @Override
             public void onResponse(Call<Lists> call, Response<Lists> response) {
-                Log.i("TAG", "onResponse: 3");
+
                 if(response.isSuccessful()){
                     //stocke les listes
                     List<UneListe> lists = response.body().listeDeListes;
                     data = new ArrayList<ListeToDo>();
                     for (UneListe x : lists) {
-                        data.add(new ListeToDo(x.titreListeToDO,x.id));
+                        data.add(new ListeToDo(x.titreListeToDO, x.id));
                         Log.i("TAG", "onResponse: " + x.id + " " + x.titreListeToDO);
                     }
                     /* Mise en place de la Recycler View sur la liste des ToDoLists associée au profil*/
@@ -154,7 +143,7 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
                     recyclerView.setAdapter(itemAdapterList);
                     recyclerView.setLayoutManager(new LinearLayoutManager(ChoixListActivity.this));
 
-                }else {
+                } else {
                     Log.d("TAG", "onResponse: "+response.code());
                 }
             }
@@ -166,6 +155,9 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
 
     }
 
+    /** Permet d'ajouter une ToDoList à la RecyclerView et dans l'API
+     * @param label la description associée à la nouvelle ToDoList
+     */
     private void ajoutListe(String label) {
         todoApiService = TodoApiServiceFactory.createService(TodoApiService.class);
         Call<ListResponse> call = todoApiService.ajoutListe(hash,label);

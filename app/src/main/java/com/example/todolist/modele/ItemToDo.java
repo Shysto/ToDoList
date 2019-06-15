@@ -10,7 +10,7 @@ public class ItemToDo implements Serializable {
     private String description;
     /* Indique si l'item a été accompli ou non */
     private Boolean fait;
-
+    /* Identifiant de l'item */
     private int id;
 
     /* Constructeur par défaut */
@@ -36,12 +36,20 @@ public class ItemToDo implements Serializable {
         this.fait = fait;
     }
 
+    /** Constructeur par données
+     * @param description la description à fournir à l'item
+     * @param fait indique si l'item est accompli
+     * @param id l'identifiant de l'item
+     */
     public ItemToDo(String description, Boolean fait, int id) {
         this.description = description;
         this.fait = fait;
         this.id = id;
     }
 
+    /** Accesseur de l'identifiant
+     * @return l'identifiant associé à l'item
+     */
     public int getId() {
         return id;
     }
@@ -67,8 +75,11 @@ public class ItemToDo implements Serializable {
         return fait;
     }
 
+    /**
+     * @return 1 si l'item est fait, 0 sinon
+     */
     public int getFait(){
-        if(fait)
+        if (fait)
             return 1;
         else
             return 0;

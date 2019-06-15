@@ -41,7 +41,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TodoApiService todoApiService;
 
     /** Fonction onCreate appelée lors de le création de l'activité
-     * @param savedInstanceState données à récupérer si l'activité est réinitialisée après avoir planté
+     * @param savedInstanceState données à récupérer si l'activité est réinitialisée après
+     *          avoir planté
      * Lie l'activité à son layout et récupère les éléments avec lesquels on peut intéragir
      */
     @Override
@@ -55,14 +56,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         btnOk.setOnClickListener(this);
-
     }
 
 
 
-    /** Fonction onResume appelée lors de la reprise de l'activité principale après mise en pause pour cause d'appel à une autre activité
-     * Permet de remplir par défaut le champ pseudo avec le denrier pseudo rentré
+    /** Fonction onResume appelée lors de la reprise de l'activité principale après mise en pause
+     *          pour cause d'appel à une autre activité
+     * Permet de remplir par défaut le champ pseudo avec le dernier pseudo rentré
      * Le pseudo sera ainsi rafraichit à chaque fois
+     * Permet aussi d'activer/désactiver le bouton OK en fonction de l'état du réseau,
+     *          et de récupérer l'URL de l'API
      */
     @Override
     protected void onResume() {
@@ -99,7 +102,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /** Fonction par défaut de l'interface View.OnClickListener, appelée lors du clic sur la vue
      * @param v la vue cliquée
-     * Ici, lors du clic sur le bouton OK, on ouvre l'activité ChoixListe Activity et on sauvegarde le pseudo dans les préférences
+     * Ici, lors du clic sur le bouton OK, on ouvre l'activité ChoixListe Activity et on sauvegarde
+     *         le pseudo dans les préférences
      */
     @Override
     public void onClick(View v) {
@@ -116,7 +120,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * Fournit le pseudo rentré par l'utilisateur à cette nouvelle activité
      */
     private void ouvrirChoixListeActivity() {
-        Intent choixListeActivity = new Intent(MainActivity.this, ChoixListActivity.class);
+        Intent choixListeActivity = new Intent(MainActivity.this,
+                ChoixListActivity.class);
         choixListeActivity.putExtra("pseudo",editTextPseudo.getText().toString());
         startActivity(choixListeActivity);
     }
@@ -132,6 +137,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editor.commit();
     }
 
+    /** Permet de vérifier l'URL de connexion à l'API, et de la changer le cas échéant
+     * Récupère l'URL à partir des préférences de l'application
+     * Si l'URL est vide, remplisssage avec ue adresse par défaut
+     */
     private void verfierUrl() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -145,6 +154,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         TodoApiServiceFactory.changeApiBaseUrl(url);
     }
 
+    /** Fonction qui permet de vérifier l'état du réseau WIFI
+     * @return true si on active le bouton (on est bien connecté au réseau WIFI), false sinon
+     */
     public boolean verifReseau()
     {
         // On vérifie si le réseau est disponible,
@@ -178,18 +190,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return bStatut;
     }
 
+    /** Fonction principale de l'activité
+     * Permet de lancer une requête de connexion à l'API, et de récupérer le cas échéant le hash
+     *      d'identification
+     * Ouvre une nouvelle activité (ChoixListeActivity) en cas de succès de la requête
+     */
     private void sync() {
 
         todoApiService = TodoApiServiceFactory.createService(TodoApiService.class);
 
-        call = todoApiService.connexion(editTextPseudo.getText().toString(), password.getText().toString());
+        call = todoApiService.connexion(editTextPseudo.getText().toString(),
+                password.getText().toString());
         call.enqueue(new Callback<Hash>() {
             @Override
             public void onResponse(Call<Hash> call, Response<Hash> response) {
 
                 if(response.isSuccessful()){
-                    // stocker hash et passer en bundle
-                    //intent
+
+                    /* On stocke le hash dans les préférences */
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putString("hash",response.body().hash);
                     editor.apply();
@@ -198,23 +216,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     Log.i("Main", "onResponse: " + response.body().hash );
 
+                    /* On ouvre la prochaine activité (nouvel intent) */
                     ouvrirChoixListeActivity();
 
 
                 } else {
                     Log.d("TAG", "onResponse: "+response.code());
-                    Toast.makeText(MainActivity.this,"Error code : "+response.code(),Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this,"Error code : " +
+                            response.code(),Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override public void onFailure(Call<Hash> call, Throwable t) {
-                Toast.makeText(MainActivity.this,"Error code : " ,Toast.LENGTH_LONG).show();
-                Log.d("TAG", "onFailure() called with: call = [" + call + "], t = [" + t + "]");
+                Toast.makeText(MainActivity.this,"Error code : ",
+                        Toast.LENGTH_LONG).show();
+                Log.d("TAG", "onFailure() called with: call = [" + call +
+                        "], t = [" + t + "]");
             }
         });
 
     }
 
+    /** Fonction appelée lors de l'arrêt de l'activité
+     * On "vide" la file d'appels de requêtes vers l'API
+     */
     @Override protected void onStop() {
         super.onStop();
         call.cancel();
