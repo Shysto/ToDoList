@@ -1,6 +1,6 @@
 package com.example.todolist.api;
 
-import com.example.todolist.api.response_class.Hash;
+import com.example.todolist.api.response_class.User;
 import com.example.todolist.api.response_class.ItemResponse;
 import com.example.todolist.api.response_class.Items;
 import com.example.todolist.api.response_class.ListResponse;
@@ -26,7 +26,7 @@ public interface TodoApiService {
    * @return le hash d'identification en cas de succès de la requête
    */
   @POST("authenticate")
-  Call<Hash> connexion(@Query("user") String user, @Query("password") String password);
+  Call<User> connexion(@Query("user") String user, @Query("password") String password);
 
   /** Requête de récupération de l'ensemble des listes associées à l'utilisateur courant
    * @param hash le hash de l'utilisateur courant

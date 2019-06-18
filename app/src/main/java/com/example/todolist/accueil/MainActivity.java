@@ -15,11 +15,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
 
 import com.example.todolist.R;
-import com.example.todolist.api.response_class.Hash;
+import com.example.todolist.api.response_class.User;
 import com.example.todolist.api.TodoApiService;
 import com.example.todolist.api.TodoApiServiceFactory;
+import com.example.todolist.bdd.AppDatabase;
 import com.example.todolist.recycler_activities.ChoixListActivity;
 
 import retrofit2.Call;
@@ -36,9 +38,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     EditText password;
     String url;
     Button btnOk;
-    private Call<Hash> call;
+    private Call<User> call;
     SharedPreferences preferences;
     TodoApiService todoApiService;
+    AppDatabase db;
 
     /** Fonction onCreate appelée lors de le création de l'activité
      * @param savedInstanceState données à récupérer si l'activité est réinitialisée après
@@ -56,6 +59,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         btnOk.setOnClickListener(this);
+
+        db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "database-name").build();
     }
 
 
@@ -201,9 +207,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         call = todoApiService.connexion(editTextPseudo.getText().toString(),
                 password.getText().toString());
-        call.enqueue(new Callback<Hash>() {
+        call.enqueue(new Callback<User>() {
             @Override
-            public void onResponse(Call<Hash> call, Response<Hash> response) {
+            public void onResponse(Call<User> call, Response<User> response) {
 
                 if(response.isSuccessful()){
 
@@ -227,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
 
-            @Override public void onFailure(Call<Hash> call, Throwable t) {
+            @Override public void onFailure(Call<User> call, Throwable t) {
                 Toast.makeText(MainActivity.this,"Error code : ",
                         Toast.LENGTH_LONG).show();
                 Log.d("TAG", "onFailure() called with: call = [" + call +
