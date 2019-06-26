@@ -12,8 +12,8 @@ import java.util.List;
 @Dao
 public interface UneListeDao {
 
-    @Query("SELECT * FROM lists WHERE hash = 'ac74471412026f677735d412e4a07a20' ")
-    List<UneListe> getAll();
+    @Query("SELECT * FROM lists WHERE hash = :hash ")
+    List<UneListe> getAll(String hash);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<UneListe> todolists);

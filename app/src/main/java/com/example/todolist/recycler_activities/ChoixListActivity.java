@@ -295,7 +295,7 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                List<UneListe> lesListes = database.listeDao().getAll();
+                List<UneListe> lesListes = database.listeDao().getAll(hash);
                 for (UneListe liste: lesListes) {
                     List<UnItem> lesItems = database.itemDao().getAll(liste.id);
                     for (UnItem item: lesItems) {
@@ -324,7 +324,7 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
 
     private void recupListesDB() {
         Log.i("PMR", "recupListesDB");
-        List<UneListe> lists = database.listeDao().getAll();
+        List<UneListe> lists = database.listeDao().getAll(hash);
         data = new ArrayList<ListeToDo>();
         for (UneListe x : lists) {
             data.add(new ListeToDo(x.titreListeToDO, x.id));
