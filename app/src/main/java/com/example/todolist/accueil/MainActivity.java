@@ -1,9 +1,13 @@
 package com.example.todolist.accueil;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -40,6 +44,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     SharedPreferences preferences;
     TodoApiService todoApiService;
     private Button btnCache;
+    private ConnectivityManager connectivityManager;
+    private NetworkInfo activeNetworkInfo;
+    private boolean estConnecte;
+    private ConnectivityManager.NetworkCallback connectivityCallback;
 
     /** Fonction onCreate appelée lors de le création de l'activité
      * @param savedInstanceState données à récupérer si l'activité est réinitialisée après
@@ -60,6 +68,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnOk.setOnClickListener(this);
         btnCache.setOnClickListener(this);
 
+        connectivityManager = (ConnectivityManager) getSystemService(
+                Context.CONNECTIVITY_SERVICE);
+        activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        estConnecte = activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+
+        btnCache.setVisibility( (estConnecte) ? View.GONE : View.VISIBLE );
+        btnOk.setEnabled(estConnecte);
+
+        connectivityCallback
+                = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(Network network) {
+                estConnecte = true;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        btnOk.setEnabled(estConnecte);
+                        btnCache.setVisibility(View.GONE);
+                    }
+                });
+                Log.i("PMR", "INTERNET CONNECTED");
+
+            }
+
+            @Override
+            public void onLost(Network network) {
+                estConnecte = false;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        btnOk.setEnabled(estConnecte);
+                        btnCache.setVisibility(View.VISIBLE);
+                    }
+                });
+                Log.i("PMR", "INTERNET LOST");
+
+            }
+        };
+
+        connectivityManager.registerNetworkCallback(
+                new NetworkRequest.Builder()
+                        .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                        .build(), connectivityCallback);
+
     }
 
 
@@ -77,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         /* Affichage du dernier pseudo saisi */
         editTextPseudo.setText(preferences.getString("pseudo",""));
         verfierUrl();
-        btnOk.setEnabled(verifReseau());
 
     }
 
@@ -117,7 +170,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 sync();
                 break;
             case R.id.btnCache:
-                ouvrirChoixListeActivity();
+                // Securisation de la connexion hors-ligne
+                if (preferences.getString("passe","dfshiuo45641519684684doijziojxijFJKHEKZJFDJIZENFNEJIZNFJKJAOADZDaoijdzijxozaj45661511zixjaopidsza5d465zaq498ed456z4a8d489aAZDAZDADZDz49s4a4ds894s854az4").equals(password.getText().toString()))
+                    ouvrirChoixListeActivity();
         }
     }
 
@@ -159,42 +214,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         TodoApiServiceFactory.changeApiBaseUrl(url);
     }
 
-    /** Fonction qui permet de vérifier l'état du réseau WIFI
-     * @return true si on active le bouton (on est bien connecté au réseau WIFI), false sinon
-     */
-    public boolean verifReseau()
-    {
-        // On vérifie si le réseau est disponible,
-        // si oui on change le statut du bouton de connexion
-        ConnectivityManager cnMngr = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cnMngr.getActiveNetworkInfo();
-
-        String sType = "Aucun réseau détecté";
-        Boolean bStatut = false;
-        if (netInfo != null)
-        {
-
-            NetworkInfo.State netState = netInfo.getState();
-
-            if (netState.compareTo(NetworkInfo.State.CONNECTED) == 0)
-            {
-                bStatut = true;
-                int netType= netInfo.getType();
-                switch (netType)
-                {
-                    case ConnectivityManager.TYPE_MOBILE :
-                        sType = "Réseau mobile détecté"; break;
-                    case ConnectivityManager.TYPE_WIFI :
-                        sType = "Réseau wifi détecté"; break;
-                }
-
-            }
-        }
-
-        Log.i("REZO", "verifReseau: " + sType );
-        return bStatut;
-    }
-
     /** Fonction principale de l'activité
      * Permet de lancer une requête de connexion à l'API, et de récupérer le cas échéant le hash
      *      d'identification
@@ -215,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     /* On stocke le hash dans les préférences */
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putString("hash",response.body().hash);
+                    editor.putString(("passe"), password.getText().toString());
                     editor.apply();
                     editor.commit();
 
