@@ -2,11 +2,11 @@ package com.example.todolist.bdd;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
 import com.example.todolist.api.response_class.UnItem;
-import com.example.todolist.api.response_class.UneListe;
 
 import java.util.List;
 
@@ -16,8 +16,8 @@ public interface UnItemDao {
     List<UnItem> getAll(int idListe);
 
     @Update
-    void updateUsers(UnItem... item);
+    void updateItem(UnItem item);
 
-    @Insert
-    void insertAll(UnItem... items);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertAll(List<UnItem> items);
 }

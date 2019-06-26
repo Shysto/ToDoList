@@ -24,7 +24,6 @@ import com.example.todolist.api.response_class.ItemResponse;
 import com.example.todolist.api.response_class.Items;
 import com.example.todolist.api.response_class.UnItem;
 import com.example.todolist.modele.ItemToDo;
-import com.example.todolist.modele.ProfilListeToDo;
 import com.example.todolist.recycler_activities.adapter.ItemAdapterItem;
 
 import java.util.ArrayList;
@@ -56,6 +55,7 @@ public class ShowListActivity extends Library implements View.OnClickListener,
     private String hash;
     /* L'interface de connexion auprès de l'API */
     private TodoApiService todoApiService;
+    private Button btnOk;
 
     /**
      * Fonction onCreate appelée lors de le création de l'activité
@@ -76,7 +76,7 @@ public class ShowListActivity extends Library implements View.OnClickListener,
         idListe = b.getInt("idListe");
 
         /* Traitement de l'ajout d'un item à la ToDoList */
-        Button btnOk = findViewById(R.id.btnOk);
+        btnOk = findViewById(R.id.btnOk);
         btnOk.setOnClickListener(this);
         ajouterItem = findViewById(R.id.ajouterItem);
     }
@@ -89,7 +89,19 @@ public class ShowListActivity extends Library implements View.OnClickListener,
     @Override
     protected void onResume() {
         super.onResume();
-        recupItems();
+        super.onResume();
+        estConnecte = activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+        btnOk.setEnabled(estConnecte);
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (estConnecte)
+                    recupItems();
+                else
+                    recupItemsBDD();
+            }
+        });
+
     }
 
    
@@ -113,12 +125,22 @@ public class ShowListActivity extends Library implements View.OnClickListener,
      * @param position l'indice où se trouve l'item dans la liste des items
      */
     @Override
-    public void clickItem(int position) {
+    public void clickItem(final int position) {
         listeItem.get(position).setFait(!listeItem.get(position).isFait());
         itemAdapterItem.notifyItemChanged(position);
         Log.i("TAG", "clickItem: " + listeItem.get(position).getFait());
         Log.i("TAG", "clickItem: "+ listeItem.get(position).getId());
-        cocherItem(listeItem.get(position).getId(), listeItem.get(position).getFait());
+
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                database.itemDao().updateItem(new UnItem(listeItem.get(position), idListe));
+
+                if(estConnecte)
+                    cocherItem(listeItem.get(position).getId(), listeItem.get(position).getFait());
+            }
+        });
+
     }
 
     /** Permet de récupérer la liste des items associée à la ToDoList d'identifiant idListe de
@@ -131,19 +153,32 @@ public class ShowListActivity extends Library implements View.OnClickListener,
 
         call.enqueue(new Callback<Items>() {
             @Override
-            public void onResponse(Call<Items> call, Response<Items> response) {
+            public void onResponse(Call<Items> call, final Response<Items> response) {
                 if(response.isSuccessful()){
-                    //stocke les listes
-                    List<UnItem> liste = response.body().listeItems;
-                    listeItem = new ArrayList<ItemToDo>();
-                    for (UnItem x : liste) {
-                        listeItem.add(new ItemToDo(x.label,x.checked == 1, x.id));
-                        Log.i("TAG", "onResponse: " + x.id + " ");
-                    }
-                    recyclerView = findViewById(R.id.recyclerView);
-                    itemAdapterItem = new ItemAdapterItem(listeItem, ShowListActivity.this);
-                    recyclerView.setAdapter(itemAdapterItem);
-                    recyclerView.setLayoutManager(new LinearLayoutManager(ShowListActivity.this));
+
+                    executor.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            //stocke les listes
+                            List<UnItem> liste = response.body().listeItems;
+                            listeItem = new ArrayList<ItemToDo>();
+                            for (UnItem x : liste) {
+                                listeItem.add(new ItemToDo(x.label,x.checked == 1, x.id));
+                                Log.i("TAG", "onResponse: " + x.id + " ");
+                                x.idListe = idListe;
+                            }
+                            database.itemDao().insertAll(liste);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    recyclerView = findViewById(R.id.recyclerView);
+                                    itemAdapterItem = new ItemAdapterItem(listeItem, ShowListActivity.this);
+                                    recyclerView.setAdapter(itemAdapterItem);
+                                    recyclerView.setLayoutManager(new LinearLayoutManager(ShowListActivity.this));
+                                }
+                            });
+                        }
+                    });
 
                 } else {
                     Log.d("TAG", "onResponse: "+response.code());
@@ -205,6 +240,25 @@ public class ShowListActivity extends Library implements View.OnClickListener,
                 Log.d("TAG", "onFailure() called with: call = [" + call + "], t = [" + t + "]");
             }
         });
+    }
+
+    private void recupItemsBDD(){
+        List<UnItem> liste = database.itemDao().getAll(idListe);
+        listeItem = new ArrayList<ItemToDo>();
+        for (UnItem x : liste) {
+            listeItem.add(new ItemToDo(x.label,x.checked == 1, x.id));
+            Log.i("TAG", "onResponse: " + x.id + " ");
+        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                recyclerView = findViewById(R.id.recyclerView);
+                itemAdapterItem = new ItemAdapterItem(listeItem, ShowListActivity.this);
+                recyclerView.setAdapter(itemAdapterItem);
+                recyclerView.setLayoutManager(new LinearLayoutManager(ShowListActivity.this));
+            }
+        });
+
     }
 
 }

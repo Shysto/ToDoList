@@ -1,13 +1,7 @@
 package com.example.todolist.recycler_activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
-import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -25,17 +19,13 @@ import com.example.todolist.api.TodoApiService;
 import com.example.todolist.api.TodoApiServiceFactory;
 import com.example.todolist.api.response_class.ListResponse;
 import com.example.todolist.api.response_class.Lists;
-import com.example.todolist.api.response_class.UnItem;
 import com.example.todolist.api.response_class.UneListe;
-import com.example.todolist.bdd.AppDatabase;
 import com.example.todolist.modele.ListeToDo;
 import com.example.todolist.modele.ProfilListeToDo;
 import com.example.todolist.recycler_activities.adapter.ItemAdapterList;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -69,16 +59,7 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
     /* La liste de ToDoLists associée à l'utilisateur courant */
     private List<ListeToDo> data;
 
-    private boolean estConnecte;
-    private ConnectivityManager connectivityManager;
-    // Getting network Info
-    // give Network Access Permission in Manifest
-    private NetworkInfo activeNetworkInfo;
-    private ConnectivityManager.NetworkCallback connectivityCallback;
 
-    private AppDatabase database;
-
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
     private Button btnOk;
 
 
@@ -95,8 +76,9 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
 
         /* Récupération du pseudo depuis les préférences de l'application */
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        pseudo = preferences.getString("pseudo", "");
+
         hash = preferences.getString("hash", "");
+        pseudo = preferences.getString("pseudo", "");
         Log.i("PMR", "onCreate: " + hash);
 
 
@@ -104,36 +86,9 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
         btnOk = findViewById(R.id.btnOk);
         btnOk.setOnClickListener(this);
         ajouterListe = findViewById(R.id.ajouterListe);
-        connectivityManager = (ConnectivityManager) getSystemService(
-                Context.CONNECTIVITY_SERVICE);
-        activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        estConnecte = activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
 
-        connectivityCallback
-                = new ConnectivityManager.NetworkCallback() {
-            @Override
-            public void onAvailable(Network network) {
-                if(!estConnecte)
-                    majAPI();
-                estConnecte = true;
-                Log.i("PMR", "INTERNET CONNECTED");
 
-            }
 
-            @Override
-            public void onLost(Network network) {
-                estConnecte = false;
-                Log.i("PMR", "INTERNET LOST");
-
-            }
-        };
-
-        connectivityManager.registerNetworkCallback(
-                new NetworkRequest.Builder()
-                        .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                        .build(), connectivityCallback);
-
-        database = AppDatabase.getInstance(this);
     }
 
     /**
@@ -281,47 +236,6 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
         });
     }
 
-
-    private void majAPI() {
-        /*
-        Dans un executor
-            les listes = db.unelistedao.getALL()
-            for liste in leslistes:
-                lesItems = db. .....  . getAll()
-                for item in lesItems
-                    call API de maj de l'état ( cocher Item)
-
-         */
-
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                List<UneListe> lesListes = database.listeDao().getAll(hash);
-                for (UneListe liste: lesListes) {
-                    List<UnItem> lesItems = database.itemDao().getAll(liste.id);
-                    for (UnItem item: lesItems) {
-                        todoApiService = TodoApiServiceFactory.createService(TodoApiService.class);
-                        Call<UnItem> call = todoApiService.cocherItem(hash, liste.id, item.id, item.checked);
-                        call.enqueue(new Callback<UnItem>() {
-                            @Override
-                            public void onResponse(Call<UnItem> call, Response<UnItem> response) {
-                                if(response.isSuccessful()){
-                                    Log.i("TAG", "onResponse: nice");
-                                } else {
-                                    Log.d("TAG", "onResponse: "+response.code());
-                                }
-                            }
-                            @Override public void onFailure(Call<UnItem> call, Throwable t) {
-                                Toast.makeText(ChoixListActivity.this,"Error code : " ,Toast.LENGTH_LONG).show();
-                                Log.d("TAG", "onFailure() called with: call = [" + call + "], t = [" + t + "]");
-                            }
-                        });
-                    }
-
-                }
-            }
-        });
-    }
 
     private void recupListesDB() {
         Log.i("PMR", "recupListesDB");

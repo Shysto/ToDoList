@@ -5,6 +5,7 @@ import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
+import com.example.todolist.modele.ItemToDo;
 import com.google.gson.annotations.SerializedName;
 
 /** Définition de la classe UnItem.
@@ -40,4 +41,13 @@ public class UnItem {
     @SerializedName("idList")
     public int idListe;
 
+    public UnItem() {
+    }
+
+    public UnItem(ItemToDo item, int idListe) {
+        this.id = item.getId();
+        this.label = item.getDescription();
+        this.checked = item.getFait();
+        this.idListe = idListe;
+    }
 }
