@@ -1,7 +1,13 @@
 package com.example.todolist.recycler_activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -58,6 +64,13 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
     /* La liste de ToDoLists associée à l'utilisateur courant */
     private List<ListeToDo> data;
 
+    private boolean estConnecte;
+    private ConnectivityManager connectivityManager ;
+    // Getting network Info
+    // give Network Access Permission in Manifest
+    private NetworkInfo activeNetworkInfo;
+    private ConnectivityManager.NetworkCallback connectivityCallback;
+
 
     /** Fonction onCreate appelée lors de le création de l'activité
      * @param savedInstanceState données à récupérer si l'activité est réinitialisée après avoir planté
@@ -78,6 +91,31 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
         Button btnOk = findViewById(R.id.btnOk);
         btnOk.setOnClickListener(this);
         ajouterListe = findViewById(R.id.ajouterListe);
+        connectivityManager = (ConnectivityManager) getSystemService(
+                Context.CONNECTIVITY_SERVICE);
+        activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        connectivityCallback
+                = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(Network network) {
+                estConnecte = true;
+                Log.i("PMR", "INTERNET CONNECTED");
+
+
+            }
+
+            @Override
+            public void onLost(Network network) {
+                estConnecte = false;
+                Log.i("PMR", "INTERNET LOST");
+
+            }
+        };
+
+        connectivityManager.registerNetworkCallback(
+                new NetworkRequest.Builder()
+                        .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                        .build(), connectivityCallback);
     }
 
     /** Fonction onResume appelée après la création de l'activité et à chaque retour sur l'activité courante
@@ -86,7 +124,13 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
     @Override
     protected void onResume() {
         super.onResume();
-        sync();
+        sync(); // ou recupListsDB si estConnecte is false
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        connectivityManager.unregisterNetworkCallback(connectivityCallback);
     }
 
     /** Fonction par défaut de l'interface View.OnClickListener, appelée lors du clic sur la vue
@@ -137,6 +181,9 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
                         data.add(new ListeToDo(x.titreListeToDO, x.id));
                         Log.i("TAG", "onResponse: " + x.id + " " + x.titreListeToDO);
                     }
+
+                    //stocker dans database (avec database.insertAll(lists))
+
                     /* Mise en place de la Recycler View sur la liste des ToDoLists associée au profil*/
                     recyclerView = findViewById(R.id.recyclerView);
                     itemAdapterList = new ItemAdapterList(data,ChoixListActivity.this);
@@ -179,5 +226,48 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
                 Log.d("TAG", "onFailure() called with: call = [" + call + "], t = [" + t + "]");
             }
         });
+    }
+
+    private void syncDB(){
+        /*
+        Dans un executor
+            Appel API
+            onResponse :
+                convertir les listes API en listes Database
+
+                mettre dans l'adapter
+                maj adapter
+         */
+    }
+
+    private void unefoisnetworkrecuperer(){
+        /*
+        Dans un executor
+            les listes = db.unelistedao.getALL()
+            for liste in leslistes:
+                lesItems = db. .....  . getAll()
+                for item in lesItems
+                    call API de maj de l'état ( cocher Item)
+
+         */
+    }
+
+
+
+
+
+    /**
+     * Permet de mettre en place le connectivity manager
+     */
+    private void verificationReseau() {
+
+        // estConnecte is a boolean variable
+        // here we check if network is connected or is getting connected
+        estConnecte = activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+        // SHOW ANY ACTION YOU WANT TO SHOW
+        // WHEN WE ARE NOT CONNECTED TO INTERNET/NETWORK
+        Log.i("PMR", "  ");
+        // if Network is not connected we will register a network callback to  monitor network
+
     }
 }
