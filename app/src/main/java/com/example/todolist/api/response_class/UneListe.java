@@ -2,7 +2,6 @@ package com.example.todolist.api.response_class;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
@@ -11,9 +10,7 @@ import com.google.gson.annotations.SerializedName;
  * Cette classe structure une ToDoList telle que conçue dans l'API, et est utilisée dans la classe
  *          Lists
  */
-@Entity(tableName = "lists", foreignKeys = @ForeignKey(entity = User.class,
-        parentColumns = "id",
-        childColumns = "idUser"))
+@Entity(tableName = "lists")
 public class UneListe {
 
     /**
@@ -30,7 +27,6 @@ public class UneListe {
     @SerializedName("label")
     public String titreListeToDO;
 
-    @ColumnInfo(name = "idUser")
-    @SerializedName("idUser")
-    public int idUser;
+    @ColumnInfo(name = "hash")
+    public String hash;
 }

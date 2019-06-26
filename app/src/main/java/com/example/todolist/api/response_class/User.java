@@ -17,6 +17,8 @@ public class User {
     /**
      * Le hash d'identification récupéré
      */
+    @NonNull
+    @PrimaryKey
     @ColumnInfo(name = "hash")
     @SerializedName("hash")
     public String hash;
@@ -25,8 +27,7 @@ public class User {
     @SerializedName("pseudo")
     public String pseudo;
 
-    @NonNull
-    @PrimaryKey
+
     @ColumnInfo(name = "id")
     @SerializedName("id")
     public String id;

@@ -15,13 +15,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
 
 import com.example.todolist.R;
-import com.example.todolist.api.response_class.User;
 import com.example.todolist.api.TodoApiService;
 import com.example.todolist.api.TodoApiServiceFactory;
-import com.example.todolist.bdd.AppDatabase;
+import com.example.todolist.api.response_class.User;
 import com.example.todolist.recycler_activities.ChoixListActivity;
 
 import retrofit2.Call;
@@ -41,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Call<User> call;
     SharedPreferences preferences;
     TodoApiService todoApiService;
-    AppDatabase db;
+    private Button btnCache;
 
     /** Fonction onCreate appelée lors de le création de l'activité
      * @param savedInstanceState données à récupérer si l'activité est réinitialisée après
@@ -54,14 +52,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         btnOk = findViewById(R.id.btnOk);
+        btnCache = findViewById(R.id.btnCache);
         editTextPseudo = findViewById(R.id.editTextPseudo);
         password = findViewById(R.id.password);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         btnOk.setOnClickListener(this);
+        btnCache.setOnClickListener(this);
 
-        db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "database-name").build();
     }
 
 
@@ -118,7 +116,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 sauverPseudo();
                 sync();
                 break;
-            default:
+            case R.id.btnCache:
+                ouvrirChoixListeActivity();
         }
     }
 
@@ -248,6 +247,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     @Override protected void onStop() {
         super.onStop();
-        call.cancel();
+        if (call != null)
+            call.cancel();
     }
 }
