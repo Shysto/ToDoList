@@ -79,6 +79,7 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
     private AppDatabase database;
 
     private ExecutorService executor = Executors.newSingleThreadExecutor();
+    private Button btnOk;
 
 
     /**
@@ -100,7 +101,7 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
 
 
         /* Traitement de l'ajout d'une ToDoList au profil */
-        Button btnOk = findViewById(R.id.btnOk);
+        btnOk = findViewById(R.id.btnOk);
         btnOk.setOnClickListener(this);
         ajouterListe = findViewById(R.id.ajouterListe);
         connectivityManager = (ConnectivityManager) getSystemService(
@@ -143,7 +144,7 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
     protected void onResume() {
         super.onResume();
         estConnecte = activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
-
+        btnOk.setEnabled(estConnecte);
         executor.execute(new Runnable() {
             @Override
             public void run() {
