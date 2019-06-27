@@ -44,6 +44,11 @@ abstract public class Library extends AppCompatActivity {
     boolean estConnecte;
     ConnectivityManager.NetworkCallback connectivityCallback;
 
+    /** Fonction onCreate appelée lors de le création de l'activité
+     * @param savedInstanceState données à récupérer si l'activité est réinitialisée après
+     *          avoir planté
+     * On initialise le Connectivity Manager
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,6 +87,9 @@ abstract public class Library extends AppCompatActivity {
         database = AppDatabase.getInstance(getApplicationContext());
     }
 
+    /**
+     * Permet de mettre à jour l'API (méthode appelée lors de la récupération du réseau
+     */
     void majAPI() {
         executor.execute(new Runnable() {
             @Override

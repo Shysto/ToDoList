@@ -41,8 +41,7 @@ public class UnItem {
     @SerializedName("idList")
     public int idListe;
 
-    public UnItem() {
-    }
+    public UnItem() {}
 
     public UnItem(ItemToDo item, int idListe) {
         this.id = item.getId();

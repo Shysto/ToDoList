@@ -6,8 +6,6 @@ import androidx.room.Query;
 
 import com.example.todolist.api.response_class.User;
 
-import java.util.List;
-
 @Dao
 public interface UserDao {
 

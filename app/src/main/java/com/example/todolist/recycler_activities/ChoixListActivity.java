@@ -67,7 +67,7 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
      * Fonction onCreate appelée lors de le création de l'activité
      *
      * @param savedInstanceState données à récupérer si l'activité est réinitialisée après avoir planté
-     *                           Lie l'activité à son layout et récupère les éléments avec lesquels on peut intéragir
+     * Lie l'activité à son layout et récupère les éléments avec lesquels on peut intéragir
      */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,14 +86,12 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
         btnOk = findViewById(R.id.btnOk);
         btnOk.setOnClickListener(this);
         ajouterListe = findViewById(R.id.ajouterListe);
-
-
-
     }
 
     /**
      * Fonction onResume appelée après la création de l'activité et à chaque retour sur l'activité courante
-     * Permet de générer la RecyclerView associée à la liste des ToDoLists
+     * Permet de générer la RecyclerView associée à la liste des ToDoLists en récupérant les données
+     *      depuis l'API si on possède une connexiion réseau, depuis la BDD sinon
      */
     @Override
     protected void onResume() {
@@ -112,6 +110,9 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
     }
 
 
+    /**
+     * Fonction appelée lors de la destruction de l'activité, permet de libérer le Connectivity Manager
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -151,7 +152,7 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
 
     /**
      * Permet de récupérer la liste des ToDoLists associée à l'utilisateur courant
-     * La réponse de la requête vers l'API met à jour la liste data en cas de succès
+     * La réponse de la requête vers l'API met à jour la liste data en cas de succès, ainsi que la BDD
      */
     private void sync() {
 
@@ -237,6 +238,10 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
     }
 
 
+    /**
+     * Permet de récupérer l'ensemble des ToDoLists de l'utiilisateur auprès de la BDD
+     * Cette fonction est appelée hors-ligne
+     */
     private void recupListesDB() {
         Log.i("PMR", "recupListesDB");
         List<UneListe> lists = database.listeDao().getAll(hash);

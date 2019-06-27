@@ -1,9 +1,5 @@
 package com.example.todolist.recycler_activities;
 
-/** Définition de la classe ShowListActivity.
- * Cette classe représente l'activité ShowList Activity de l'application
- */
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -84,7 +80,8 @@ public class ShowListActivity extends Library implements View.OnClickListener,
 
     /** Fonction onResume appelée après la création de l'activité et à chaque retour sur l'activité
      *          courante
-     * Permet de générer la RecyclerView associée à la liste des items, en la récupérant depuis l'API
+     * Permet de générer la RecyclerView associée à la liste des items, en la récupérant depuis
+     *          l'API si on possède internet ou depuis la BDD dans le cas contraire
      */
     @Override
     protected void onResume() {
@@ -121,7 +118,8 @@ public class ShowListActivity extends Library implements View.OnClickListener,
         }
     }
 
-    /** Permet de changer la valeur du paramètre fait de l'item sélectionné
+    /** Permet de changer la valeur du paramètre fait de l'item sélectionné dans la BDD
+     * Si on possède du réseau, met aussi à jour l'API
      * @param position l'indice où se trouve l'item dans la liste des items
      */
     @Override
@@ -145,7 +143,7 @@ public class ShowListActivity extends Library implements View.OnClickListener,
 
     /** Permet de récupérer la liste des items associée à la ToDoList d'identifiant idListe de
      *         l'utilisateur courant auprès de l'API
-     * Met à jour la RecyclerView en cas de succès de la requête
+     * Met à jour la RecyclerView en cas de succès de la requête et la BDD
      */
     private void recupItems() {
         todoApiService = TodoApiServiceFactory.createService(TodoApiService.class);
@@ -242,6 +240,9 @@ public class ShowListActivity extends Library implements View.OnClickListener,
         });
     }
 
+    /**
+     * Permet de récupérer la liste des items d'une ToDoList, et met à jour la RecyclerView
+     */
     private void recupItemsBDD(){
         List<UnItem> liste = database.itemDao().getAll(idListe);
         listeItem = new ArrayList<ItemToDo>();

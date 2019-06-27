@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @param savedInstanceState données à récupérer si l'activité est réinitialisée après
      *          avoir planté
      * Lie l'activité à son layout et récupère les éléments avec lesquels on peut intéragir
+     * On initialise le Connectivity Manager pour cette activité
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnCache.setVisibility( (estConnecte) ? View.GONE : View.VISIBLE );
         btnOk.setEnabled(estConnecte);
 
+        //Définition du callback du ConnectivityManager
         connectivityCallback
                 = new ConnectivityManager.NetworkCallback() {
             @Override
@@ -109,13 +111,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
 
+        // Définition du Connectivity Manager
         connectivityManager.registerNetworkCallback(
                 new NetworkRequest.Builder()
                         .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
                         .build(), connectivityCallback);
 
     }
-
 
 
     /** Fonction onResume appelée lors de la reprise de l'activité principale après mise en pause
@@ -171,7 +173,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btnCache:
                 // Securisation de la connexion hors-ligne
-                if (preferences.getString("passe","dfshiuo45641519684684doijziojxijFJKHEKZJFDJIZENFNEJIZNFJKJAOADZDaoijdzijxozaj45661511zixjaopidsza5d465zaq498ed456z4a8d489aAZDAZDADZDz49s4a4ds894s854az4").equals(password.getText().toString()))
+                if (preferences.getString("passe","dfshiuo45641519684684doijziojxijFJK"
+                        +"HEKZJFDJIZENFNEJIZNFJKJAOADZDaoijdzijxozaj45661511zixjaopidsza5d465zaq498ed"
+                        + "456z4a8d489aAZDAZDADZDz49s4a4ds894s854az4").equals(password.getText().toString())
+                && preferences.getString("pseudo", "jéçu!à'ndkf:,;,qijjoeçéhzpsgZKOGUZ9"
+                        + "83267T0zhqhfé!39E7Fb").equals(editTextPseudo.getText().toString()))
                     ouvrirChoixListeActivity();
         }
     }
@@ -192,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void sauverPseudo() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("pseudo",editTextPseudo.getText().toString());
+        editor.putString("pseudo", editTextPseudo.getText().toString());
         editor.apply();
         editor.commit();
     }
