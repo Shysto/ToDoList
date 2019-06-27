@@ -38,12 +38,8 @@ import retrofit2.Response;
 public class ChoixListActivity extends Library implements View.OnClickListener,
         ItemAdapterList.onClickListListener {
 
-    /* Le pseudo rentré par l'utilisateur dans l'activité principale */
-    private String pseudo;
     /* Le titre de la nouvelle ToDoList à ajouter, saisi par l'utilisateur dans l'activité courante */
     private EditText ajouterListe;
-    /* Le profil associé au pseudo */
-    private ProfilListeToDo profil;
     /* L'adapteur associé à la Recycler View de l'activité courante */
     private ItemAdapterList itemAdapterList;
     /* La Recycle View de l'activité courante */
@@ -58,8 +54,7 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
     private SharedPreferences preferences;
     /* La liste de ToDoLists associée à l'utilisateur courant */
     private List<ListeToDo> data;
-
-
+    /* Le bouton d'ajout d'une ToDoList */
     private Button btnOk;
 
 
@@ -67,7 +62,7 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
      * Fonction onCreate appelée lors de le création de l'activité
      *
      * @param savedInstanceState données à récupérer si l'activité est réinitialisée après avoir planté
-     * Lie l'activité à son layout et récupère les éléments avec lesquels on peut intéragir
+     *                           Lie l'activité à son layout et récupère les éléments avec lesquels on peut intéragir
      */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -78,7 +73,6 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         hash = preferences.getString("hash", "");
-        pseudo = preferences.getString("pseudo", "");
         Log.i("PMR", "onCreate: " + hash);
 
 
@@ -91,7 +85,7 @@ public class ChoixListActivity extends Library implements View.OnClickListener,
     /**
      * Fonction onResume appelée après la création de l'activité et à chaque retour sur l'activité courante
      * Permet de générer la RecyclerView associée à la liste des ToDoLists en récupérant les données
-     *      depuis l'API si on possède une connexiion réseau, depuis la BDD sinon
+     * depuis l'API si on possède une connexiion réseau, depuis la BDD sinon
      */
     @Override
     protected void onResume() {

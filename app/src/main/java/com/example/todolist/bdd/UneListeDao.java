@@ -14,6 +14,7 @@ public interface UneListeDao {
 
     /**
      * Permet de récupérer l'ensemble des ToDoLists de l'utilisateur courant stockées dans la BDD
+     *
      * @param hash le hahs de l'utilisateur courant
      * @return les ToDolists de l'utilisateur
      */
@@ -22,6 +23,7 @@ public interface UneListeDao {
 
     /**
      * Permet d'ajouter une liste de ToDoLists à la BDD
+     *
      * @param todolists la liste d ToDoLists à ajouter
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)

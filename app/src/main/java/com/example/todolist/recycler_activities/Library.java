@@ -28,7 +28,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/** Définition de la classe Library.
+/**
+ * Définition de la classe Library.
  * Cette classe contient des méthodes communes aux classes ChoixListActivity et ShowListActivity
  */
 abstract public class Library extends AppCompatActivity {
@@ -44,10 +45,12 @@ abstract public class Library extends AppCompatActivity {
     boolean estConnecte;
     ConnectivityManager.NetworkCallback connectivityCallback;
 
-    /** Fonction onCreate appelée lors de le création de l'activité
-     * @param savedInstanceState données à récupérer si l'activité est réinitialisée après
-     *          avoir planté
+    /**
+     * Fonction onCreate appelée lors de le création de l'activité
      * On initialise le Connectivity Manager
+     *
+     * @param savedInstanceState données à récupérer si l'activité est réinitialisée après
+     *                           avoir planté
      */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,7 +67,7 @@ abstract public class Library extends AppCompatActivity {
                 = new ConnectivityManager.NetworkCallback() {
             @Override
             public void onAvailable(Network network) {
-                if(!estConnecte)
+                if (!estConnecte)
                     majAPI();
                 estConnecte = true;
                 Log.i("PMR", "INTERNET CONNECTED");
@@ -95,21 +98,23 @@ abstract public class Library extends AppCompatActivity {
             @Override
             public void run() {
                 List<UneListe> lesListes = database.listeDao().getAll(hash);
-                for (UneListe liste: lesListes) {
+                for (UneListe liste : lesListes) {
                     List<UnItem> lesItems = database.itemDao().getAll(liste.id);
-                    for (UnItem item: lesItems) {
+                    for (UnItem item : lesItems) {
                         todoApiService = TodoApiServiceFactory.createService(TodoApiService.class);
                         Call<UnItem> call = todoApiService.cocherItem(hash, liste.id, item.id, item.checked);
                         call.enqueue(new Callback<UnItem>() {
                             @Override
                             public void onResponse(Call<UnItem> call, Response<UnItem> response) {
-                                if(response.isSuccessful()){
+                                if (response.isSuccessful()) {
                                     Log.i("TAG", "onResponse: nice");
                                 } else {
-                                    Log.d("TAG", "onResponse: "+response.code());
+                                    Log.d("TAG", "onResponse: " + response.code());
                                 }
                             }
-                            @Override public void onFailure(Call<UnItem> call, Throwable t) {
+
+                            @Override
+                            public void onFailure(Call<UnItem> call, Throwable t) {
                                 Log.d("TAG", "onFailure() called with: call = [" + call + "], t = [" + t + "]");
                             }
                         });

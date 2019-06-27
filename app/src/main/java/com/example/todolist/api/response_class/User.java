@@ -7,9 +7,10 @@ import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
-/** Définition de la classe User.
+/**
+ * Définition de la classe User.
  * Cette classe permet de récupérer la réponse de l'API lors de la requête de demande
- *          de connexion
+ * de connexion
  */
 @Entity(tableName = "users")
 public class User {

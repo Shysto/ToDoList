@@ -8,7 +8,8 @@ import androidx.room.PrimaryKey;
 import com.example.todolist.modele.ItemToDo;
 import com.google.gson.annotations.SerializedName;
 
-/** Définition de la classe UnItem.
+/**
+ * Définition de la classe UnItem.
  * Cette classe structure un item tel que conçu dans l'API, et est utilisée dans la classe Items
  */
 @Entity(tableName = "items", foreignKeys = @ForeignKey(entity = UneListe.class,
@@ -41,7 +42,8 @@ public class UnItem {
     @SerializedName("idList")
     public int idListe;
 
-    public UnItem() {}
+    public UnItem() {
+    }
 
     public UnItem(ItemToDo item, int idListe) {
         this.id = item.getId();

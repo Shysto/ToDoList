@@ -14,6 +14,7 @@ import java.util.List;
 public interface UnItemDao {
     /**
      * Permet de récupérer l'ensemble des items associés à une ToDoList auprès de la BDD
+     *
      * @param idListe l'identifiant de la ToDoList concernée
      * @return la liste des items de la ToDoList
      */
@@ -22,6 +23,7 @@ public interface UnItemDao {
 
     /**
      * Permet de mettre à jour un item auprès de la BDD
+     *
      * @param item l'item à mettre à jour
      */
     @Update
@@ -29,6 +31,7 @@ public interface UnItemDao {
 
     /**
      * Permet d'ajouter une liste d'items à la BDD
+     *
      * @param items la liste des items à ajouter
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -6,9 +6,10 @@ import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
-/** Définition de la classe UneListe.
+/**
+ * Définition de la classe UneListe.
  * Cette classe structure une ToDoList telle que conçue dans l'API, et est utilisée dans la classe
- *          Lists
+ * Lists
  */
 @Entity(tableName = "lists")
 public class UneListe {

@@ -30,7 +30,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/** Définition de la classe MainActivity.
+/**
+ * Définition de la classe MainActivity.
  * Cette classe représente l'activité principale de l'application
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -49,11 +50,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean estConnecte;
     private ConnectivityManager.NetworkCallback connectivityCallback;
 
-    /** Fonction onCreate appelée lors de le création de l'activité
+    /**
+     * Fonction onCreate appelée lors de le création de l'activité
+     *
      * @param savedInstanceState données à récupérer si l'activité est réinitialisée après
-     *          avoir planté
-     * Lie l'activité à son layout et récupère les éléments avec lesquels on peut intéragir
-     * On initialise le Connectivity Manager pour cette activité
+     *                           avoir planté
+     *                           Lie l'activité à son layout et récupère les éléments avec lesquels on peut intéragir
+     *                           On initialise le Connectivity Manager pour cette activité
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         estConnecte = activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
 
-        btnCache.setVisibility( (estConnecte) ? View.GONE : View.VISIBLE );
+        btnCache.setVisibility((estConnecte) ? View.GONE : View.VISIBLE);
         btnOk.setEnabled(estConnecte);
 
         //Définition du callback du ConnectivityManager
@@ -120,79 +123,88 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    /** Fonction onResume appelée lors de la reprise de l'activité principale après mise en pause
-     *          pour cause d'appel à une autre activité
+    /**
+     * Fonction onResume appelée lors de la reprise de l'activité principale après mise en pause
+     * pour cause d'appel à une autre activité
      * Permet de remplir par défaut le champ pseudo avec le dernier pseudo rentré
      * Le pseudo sera ainsi rafraichit à chaque fois
      * Permet aussi d'activer/désactiver le bouton OK en fonction de l'état du réseau,
-     *          et de récupérer l'URL de l'API
+     * et de récupérer l'URL de l'API
      */
     @Override
     protected void onResume() {
         super.onResume();
         /* Affichage du dernier pseudo saisi */
-        editTextPseudo.setText(preferences.getString("pseudo",""));
+        editTextPseudo.setText(preferences.getString("pseudo", ""));
         verfierUrl();
 
     }
 
-    /** Création de la ToolBar au démarrage de l'activité
+    /**
+     * Création de la ToolBar au démarrage de l'activité
+     *
      * @param menu le menu de la ToolBar qui contient les différents items
      * @return true pour que le menu soit affiché
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu,menu);
+        getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
 
-    /** Traitement du clic sur un item de la ToolBar
+    /**
+     * Traitement du clic sur un item de la ToolBar
+     *
      * @param item l'item du menu de la ToolBar sélectionné
      * @return true
      * Ici, un seul item est disponible, le clic ouvre l'activité Settings Activity
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent settingsIntent = new Intent(MainActivity.this,SettingsActivity.class);
+        Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
         startActivity(settingsIntent);
         return true;
     }
 
 
-    /** Fonction par défaut de l'interface View.OnClickListener, appelée lors du clic sur la vue
+    /**
+     * Fonction par défaut de l'interface View.OnClickListener, appelée lors du clic sur la vue
+     *
      * @param v la vue cliquée
-     * Ici, lors du clic sur le bouton OK, on ouvre l'activité ChoixListe Activity et on sauvegarde
-     *         le pseudo dans les préférences
+     *          Ici, lors du clic sur le bouton OK, on ouvre l'activité ChoixListe Activity et on sauvegarde
+     *          le pseudo dans les préférences
      */
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btnOk:
                 sauverPseudo();
                 sync();
                 break;
             case R.id.btnCache:
                 // Securisation de la connexion hors-ligne
-                if (preferences.getString("passe","dfshiuo45641519684684doijziojxijFJK"
-                        +"HEKZJFDJIZENFNEJIZNFJKJAOADZDaoijdzijxozaj45661511zixjaopidsza5d465zaq498ed"
+                if (preferences.getString("passe", "dfshiuo45641519684684doijziojxijFJK"
+                        + "HEKZJFDJIZENFNEJIZNFJKJAOADZDaoijdzijxozaj45661511zixjaopidsza5d465zaq498ed"
                         + "456z4a8d489aAZDAZDADZDz49s4a4ds894s854az4").equals(password.getText().toString())
-                && preferences.getString("pseudo", "jéçu!à'ndkf:,;,qijjoeçéhzpsgZKOGUZ9"
+                        && preferences.getString("pseudo", "jéçu!à'ndkf:,;,qijjoeçéhzpsgZKOGUZ9"
                         + "83267T0zhqhfé!39E7Fb").equals(editTextPseudo.getText().toString()))
                     ouvrirChoixListeActivity();
         }
     }
 
-    /** Permet d'ouvrir l'activité ChoixListe Activity
+    /**
+     * Permet d'ouvrir l'activité ChoixListe Activity
      * Fournit le pseudo rentré par l'utilisateur à cette nouvelle activité
      */
     private void ouvrirChoixListeActivity() {
         Intent choixListeActivity = new Intent(MainActivity.this,
                 ChoixListActivity.class);
-        choixListeActivity.putExtra("pseudo",editTextPseudo.getText().toString());
+        choixListeActivity.putExtra("pseudo", editTextPseudo.getText().toString());
         startActivity(choixListeActivity);
     }
 
-    /** Permet de sauvegarder le pseudo dans les préférences de l'application
+    /**
+     * Permet de sauvegarder le pseudo dans les préférences de l'application
      * Le pseudo est saisi par l'utilisateur
      */
     private void sauverPseudo() {
@@ -203,16 +215,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editor.commit();
     }
 
-    /** Permet de vérifier l'URL de connexion à l'API, et de la changer le cas échéant
+    /**
+     * Permet de vérifier l'URL de connexion à l'API, et de la changer le cas échéant
      * Récupère l'URL à partir des préférences de l'application
      * Si l'URL est vide, remplisssage avec ue adresse par défaut
      */
     private void verfierUrl() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        if(preferences.getString("url", "").equals("")){
+        if (preferences.getString("url", "").equals("")) {
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putString("url","http://tomnab.fr/todo-api/");
+            editor.putString("url", "http://tomnab.fr/todo-api/");
             editor.apply();
             editor.commit();
         }
@@ -220,9 +233,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         TodoApiServiceFactory.changeApiBaseUrl(url);
     }
 
-    /** Fonction principale de l'activité
+    /**
+     * Fonction principale de l'activité
      * Permet de lancer une requête de connexion à l'API, et de récupérer le cas échéant le hash
-     *      d'identification
+     * d'identification
      * Ouvre une nouvelle activité (ChoixListeActivity) en cas de succès de la requête
      */
     private void sync() {
@@ -235,31 +249,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
 
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
 
                     /* On stocke le hash dans les préférences */
                     SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("hash",response.body().hash);
+                    editor.putString("hash", response.body().hash);
                     editor.putString(("passe"), password.getText().toString());
                     editor.apply();
                     editor.commit();
 
 
-                    Log.i("Main", "onResponse: " + response.body().hash );
+                    Log.i("Main", "onResponse: " + response.body().hash);
 
                     /* On ouvre la prochaine activité (nouvel intent) */
                     ouvrirChoixListeActivity();
 
 
                 } else {
-                    Log.d("TAG", "onResponse: "+response.code());
-                    Toast.makeText(MainActivity.this,"Error code : " +
-                            response.code(),Toast.LENGTH_LONG).show();
+                    Log.d("TAG", "onResponse: " + response.code());
+                    Toast.makeText(MainActivity.this, "Error code : " +
+                            response.code(), Toast.LENGTH_LONG).show();
                 }
             }
 
-            @Override public void onFailure(Call<User> call, Throwable t) {
-                Toast.makeText(MainActivity.this,"Error code : ",
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Error code : ",
                         Toast.LENGTH_LONG).show();
                 Log.d("TAG", "onFailure() called with: call = [" + call +
                         "], t = [" + t + "]");
@@ -268,10 +283,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    /** Fonction appelée lors de l'arrêt de l'activité
+    /**
+     * Fonction appelée lors de l'arrêt de l'activité
      * On "vide" la file d'appels de requêtes vers l'API
      */
-    @Override protected void onStop() {
+    @Override
+    protected void onStop() {
         super.onStop();
         if (call != null)
             call.cancel();
